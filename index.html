@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Princess Tale Game 👑✨</title>
+  <style>
+    :root {
+      --primary: #ff85a2;
+      --secondary: #fbb1bd;
+      --bg-pink: #ffe5ec;
+      --accent: #ff477e;
+      --text-color: #5c3d46;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-pink);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 400px;
+      height: 650px;
+      background: #fff0f5;
+      border: 8px solid var(--secondary);
+      border-radius: 30px;
+      box-shadow: 0 15px 30px rgba(255, 133, 162, 0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stage {
+      display: none;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    .stage.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    h1, h2 {
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 1rem;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+
+    .btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 10px 24px;
+      font-size: 1.05rem;
+      font-weight: bold;
+      border-radius: 25px;
+      cursor: pointer;
+      box-shadow: 0 5px 15px rgba(255, 71, 126, 0.3);
+      transition: all 0.2s ease;
+      margin: 4px;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      background: var(--accent);
+    }
+
+    .btn-secondary {
+      background: #ffd1dc;
+      color: var(--accent);
+      box-shadow: none;
+    }
+
+    .control-bar {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 6px;
+      align-items: center;
+      padding: 0 5px;
+    }
+
+    .btn-small {
+      padding: 5px 12px;
+      font-size: 0.85rem;
+      border-radius: 15px;
+    }
+
+    canvas {
+      border-radius: 20px;
+      border: 3px solid var(--primary);
+      touch-action: none;
+      box-shadow: 0 8px 20px rgba(255, 133, 162, 0.2);
+    }
+
+    .score-board {
+      font-size: 1.05rem;
+      font-weight: bold;
+      color: var(--accent);
+    }
+
+    textarea {
+      width: 90%;
+      height: 140px;
+      border: 3px solid var(--secondary);
+      border-radius: 15px;
+      padding: 12px;
+      font-size: 1rem;
+      outline: none;
+      resize: none;
+      background: #fff;
+      color: var(--text-color);
+      margin-bottom: 15px;
+    }
+
+    /* Modal & Instructions Overlays */
+    .modal-overlay {
+      display: none;
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(255, 229, 236, 0.95);
+      backdrop-filter: blur(5px);
+      z-index: 100;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal-box {
+      background: #ffffff;
+      border: 4px solid var(--primary);
+      border-radius: 25px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(255, 71, 126, 0.25);
+      max-width: 320px;
+    }
+
+    .heart-bg {
+      position: absolute;
+      font-size: 20px;
+      color: rgba(255, 133, 162, 0.3);
+      pointer-events: none;
+      animation: float 4s infinite ease-in;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(650px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(-50px) rotate(360deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container" id="cardContainer">
+
+  <!-- Stage 1: Welcome -->
+  <div class="stage active" id="stage1">
+    <div style="font-size: 50px;">👑✨</div>
+    <h1>مغامرة الأميرة!</h1>
+    <p>أهلاً بأجمل أميرة في الدنياا كلللهاال جهزت ليكي مغامرات عسولة اوييييي وفي كل مرحلة في كلمة من قلبي مستنياكي🌚💕</p>
+    <button class="btn" onclick="startAudio(); showTutorial(2)">ابدأي المغامرة 💖</button>
+  </div>
+
+  <!-- Stage 2: Chick Game -->
+  <div class="stage" id="stage2">
+    <div class="control-bar">
+      <button class="btn btn-small btn-secondary" onclick="restartCurrentGame()">إعادة 🔄</button>
+      <div class="score-board">المرحلة 1 🐣 | النتيجة: <span id="scoreVal2">0</span></div>
+      <button class="btn btn-small btn-secondary" onclick="skipStage(3)">تخطي ⏭️</button>
+    </div>
+    <canvas id="chickCanvas" width="320" height="420"></canvas>
+  </div>
+
+  <!-- Stage 3: Moana Game -->
+  <div class="stage" id="stage3">
+    <div class="control-bar">
+      <button class="btn btn-small btn-secondary" onclick="restartCurrentGame()">إعادة 🔄</button>
+      <div class="score-board">المرحلة 2 ⛵ | النتيجة: <span id="scoreVal3">0</span></div>
+      <button class="btn btn-small btn-secondary" onclick="skipStage(4)">تخطي ⏭️</button>
+    </div>
+    <canvas id="moanaCanvas" width="320" height="420"></canvas>
+  </div>
+
+  <!-- Stage 4: Rapunzel Game -->
+  <div class="stage" id="stage4">
+    <div class="control-bar">
+      <button class="btn btn-small btn-secondary" onclick="restartCurrentGame()">إعادة 🔄</button>
+      <div class="score-board">المرحلة 3 💇‍♀️ | النتيجة: <span id="scoreVal4">0</span></div>
+      <button class="btn btn-small btn-secondary" onclick="skipStage(5)">تخطي ⏭️</button>
+    </div>
+    <canvas id="rapunzelCanvas" width="320" height="420"></canvas>
+  </div>
+
+  <!-- Stage 5: Final Message & Screenshot -->
+  <div class="stage" id="stage5">
+    <div style="font-size: 40px;">📝💌</div>
+    <h2>يا أجمل أميرة!</h2>
+    <p>وصلتِ للقطة الحاسمة! اكتبي لي رسالة من قلبكِ، وخذي لقطة شاشة (Screenshot) وأرسليها لي 📲💖</p>
+    <textarea id="princessMessage" placeholder="اكتبي رسالتكِ هنا يا أميرتي..."></textarea>
+    <button class="btn" onclick="alert('الآن خذي لقطة شاشة (Screenshot) وأرسليها لي! 📸💖')">جاهزة للإرسال 📸</button>
+  </div>
+
+  <!-- Tutorial Modal -->
+  <div class="modal-overlay" id="tutorialModal">
+    <div class="modal-box">
+      <div style="font-size: 45px;" id="tutIcon">🐣</div>
+      <h2 id="tutTitle">كيفية اللعب</h2>
+      <p id="tutText">اضغطي وحركي للقفز على السحب الوردي والوصول لأعلى سكور!</p>
+      <button class="btn" onclick="startStageAfterTutorial()">انطلقي يا أميرة 🚀</button>
+    </div>
+  </div>
+
+  <!-- Pop-up Love Message Box between Stages -->
+  <div class="modal-overlay" id="messageModal">
+    <div class="modal-box">
+      <div style="font-size: 40px;" id="modalIcon">💌</div>
+      <h2 id="modalTitle">رسالة لقلبكِ ✨</h2>
+      <p id="modalText">كلام الرسالة هنا...</p>
+      <div style="display: flex; justify-content: center; flex-wrap: wrap;">
+        <button class="btn btn-secondary" onclick="retryPreviousGame()">إعادة الدور 🔄</button>
+        <button class="btn" onclick="nextStageFromModal()">المرحلة التالية 💖</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // --- النصوص والرسائل المخصصة كـمـا هـي بـالـظـبـط ---
+  const myMessages = {
+    afterChick: {
+      title: "اشكر كتكوتة يناااااااااس كدا كدا عارف كتكوتي شطوووورة 🐣💖",
+      text: "والله كدا كدا اشطر كتكوتة ومهما كان الاسكور اللي جبتيه هو اعلى سكور في اللعبة دي عشان المكلة بتاعتي مفيش حد يجيب اعلى منها اصلا بحبكككك ينور عيني بحبكككك"
+    },
+    afterMoana: {
+      title: "احمم حمدالله عالسلامة يباشا⛵🌸",
+      text: "بحبك بحبك بحبك ومهما قولت مش هوفيكي من كتر ما انا كل شوية بحس اني بحبك اكتر كل شوية احس اني يبختي اوي واقولك بحبك مش بقولها كدا بس كل مرة والله لا انا بحسها والله بحسها واوي انتي اجمل نعمة ربنا انعم عليا بيها فيوم🍓🌟"
+    },
+    afterRapunzel: {
+      title: "يا أجمل روبانزل في الدنيا كلللها✨",
+      text: "بحبك اوي يحبيبي والله وضحكتك بس عندي بالدنيا والله وعشان كدا عملتلك دي عشان عارف انها بتفرحك بس بحبك بحبككككك اوي ينور عيني والله ودلوقتي جيه الدور عليكي تكتبيلي حاجة من قلبك🌚"
+    }
+  };
+
+  const tutorials = {
+    2: { icon: "🐣", title: "مرحلة الكتكوت", text: "اضغطي على الشاشة أو زر المسافة للقفز.. وحركي يميناً ويساراً للهبوط على السحب الوردي!" },
+    3: { icon: "⛵", title: "رحلة موانا", text: "حركي القارب بلمس الشاشة يميناً ويساراً لتفادي الصخور البحرية والوصول بأمان!" },
+    4: { icon: "💇‍♀️", title: "شعر روبانزل", text: "حركي شعر روبانزل يميناً ويساراً لمنع العصافير والعقبات من لمسه حتى يصل ليوجين!" }
+  };
+
+  let currentStageNumber = 1;
+  let nextStageTarget = 3;
+  let activeLoop = null;
+
+  // --- AUDIO SYNTHESIZER ---
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  function startAudio() {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function playJumpSound() {
+    let osc = audioCtx.createOscillator();
+    let gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(320, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(650, audioCtx.currentTime + 0.12);
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.12);
+  }
+
+  function playGameOverSound() {
+    let osc = audioCtx.createOscillator();
+    let gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(280, audioCtx.currentTime);
+    osc.frequency.linearRampToValueAtTime(140, audioCtx.currentTime + 0.25);
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+    osc.start(); osc.stop(audioCtx.currentTime + 0.25);
+  }
+
+  // --- FLOATING HEARTS ---
+  function createHeart() {
+    const heart = document.createElement('div');
+    heart.className = 'heart-bg';
+    heart.innerHTML = '🌸';
+    heart.style.left = Math.random() * 100 + '%';
+    heart.style.animationDuration = (Math.random() * 3 + 3) + 's';
+    document.getElementById('cardContainer').appendChild(heart);
+    setTimeout(() => heart.remove(), 6000);
+  }
+  setInterval(createHeart, 800);
+
+  // --- STAGE & TUTORIAL MANAGEMENT ---
+  function showTutorial(stageNum) {
+    currentStageNumber = stageNum;
+    document.getElementById('tutIcon').innerText = tutorials[stageNum].icon;
+    document.getElementById('tutTitle').innerText = tutorials[stageNum].title;
+    document.getElementById('tutText').innerText = tutorials[stageNum].text;
+    document.getElementById('tutorialModal').style.display = 'flex';
+  }
+
+  function startStageAfterTutorial() {
+    document.getElementById('tutorialModal').style.display = 'none';
+    goToStage(currentStageNumber);
+  }
+
+  function goToStage(stageNum) {
+    currentStageNumber = stageNum;
+    if (activeLoop) cancelAnimationFrame(activeLoop);
+    document.querySelectorAll('.stage').forEach(s => s.classList.remove('active'));
+    document.getElementById('stage' + stageNum).classList.add('active');
+
+    if (stageNum === 2) startChickGame();
+    if (stageNum === 3) startMoanaGame();
+    if (stageNum === 4) startRapunzelGame();
+  }
+
+  function skipStage(nextStage) {
+    goToStage(nextStage);
+  }
+
+  function restartCurrentGame() {
+    goToStage(currentStageNumber);
+  }
+
+  function retryPreviousGame() {
+    document.getElementById('messageModal').style.display = 'none';
+    goToStage(currentStageNumber);
+  }
+
+  function showLoveMessage(key, nextStage) {
+    nextStageTarget = nextStage;
+    document.getElementById('modalTitle').innerText = myMessages[key].title;
+    document.getElementById('modalText').innerText = myMessages[key].text;
+    document.getElementById('messageModal').style.display = 'flex';
+  }
+
+  function nextStageFromModal() {
+    document.getElementById('messageModal').style.display = 'none';
+    if (nextStageTarget <= 4) {
+      showTutorial(nextStageTarget);
+    } else {
+      goToStage(nextStageTarget);
+    }
+  }
+
+  // ==========================================
+  // STAGE 2: ENHANCED CHICK JUMP GAME
+  // ==========================================
+  function startChickGame() {
+    const canvas = document.getElementById('chickCanvas');
+    const ctx = canvas.getContext('2d');
+    let score = 0;
+    let chick = { x: 160, y: 220, radius: 15, vx: 0, vy: 0, gravity: 0.28, jump: -6.8 };
+    let platforms = [];
+    let particles = [];
+
+    for (let i = 0; i < 6; i++) {
+      platforms.push({ x: Math.random() * 230, y: 400 - (i * 70), width: 70, height: 12 });
+    }
+
+    function handleJump() {
+      chick.vy = chick.jump;
+      playJumpSound();
+      for (let i = 0; i < 4; i++) {
+        particles.push({ x: chick.x, y: chick.y + 15, vx: (Math.random() - 0.5) * 3, vy: Math.random() * 2, life: 1 });
+      }
+    }
+
+    canvas.onpointerdown = (e) => {
+      let rect = canvas.getBoundingClientRect();
+      let clickX = e.clientX - rect.left;
+      chick.vx = (clickX - chick.x) * 0.08;
+      if (chick.vy > -2) handleJump();
+    };
+
+    window.onkeydown = (e) => {
+      if (e.code === 'Space') handleJump();
+      if (e.code === 'ArrowLeft') chick.vx = -4;
+      if (e.code === 'ArrowRight') chick.vx = 4;
+    };
+
+    function loop() {
+      chick.vy += chick.gravity;
+      chick.y += chick.vy;
+      chick.x += chick.vx;
+      chick.vx *= 0.92;
+
+      // Screen wrap
+      if (chick.x < 0) chick.x = 320;
+      if (chick.x > 320) chick.x = 0;
+
+      // Collisions
+      platforms.forEach(p => {
+        if (chick.vy > 0 && chick.x > p.x - 5 && chick.x < p.x + p.width + 5 &&
+            chick.y + chick.radius >= p.y && chick.y + chick.radius <= p.y + p.height + 8) {
+          handleJump();
+          score += 10;
+          document.getElementById('scoreVal2').innerText = score;
+        }
+      });
+
+      // Smooth Camera Upward
+      if (chick.y < 180) {
+        let diff = 180 - chick.y;
+        chick.y = 180;
+        platforms.forEach(p => {
+          p.y += diff;
+          if (p.y > 420) {
+            p.y = 0;
+            p.x = Math.random() * 230;
+          }
+        });
+      }
+
+      // Game Over -> Show Love Message 1
+      if (chick.y > 440) {
+        playGameOverSound();
+        setTimeout(() => showLoveMessage('afterChick', 3), 400);
+        return;
+      }
+
+      // Background
+      ctx.fillStyle = '#ffdde1';
+      ctx.fillRect(0, 0, 320, 420);
+
+      // Clouds Platforms
+      platforms.forEach(p => {
+        ctx.fillStyle = '#ff85a2';
+        ctx.beginPath();
+        ctx.roundRect(p.x, p.y, p.width, p.height, 8);
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(p.x + 15, p.y + 3, 5, 0, Math.PI * 2);
+        ctx.arc(p.x + p.width - 15, p.y + 3, 5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Particles
+      particles.forEach((pt, idx) => {
+        pt.x += pt.vx; pt.y += pt.vy; pt.life -= 0.05;
+        ctx.fillStyle = `rgba(255, 255, 255, ${Math.max(pt.life, 0)})`;
+        ctx.beginPath(); ctx.arc(pt.x, pt.y, 3, 0, Math.PI * 2); ctx.fill();
+      });
+      particles = particles.filter(pt => pt.life > 0);
+
+      // Chick Body
+      ctx.beginPath();
+      ctx.arc(chick.x, chick.y, chick.radius, 0, Math.PI * 2);
+      ctx.fillStyle = '#FFE135'; ctx.fill();
+      ctx.strokeStyle = '#FFB300'; ctx.lineWidth = 2; ctx.stroke();
+
+      // Chick Crown
+      ctx.fillStyle = '#FFD700';
+      ctx.beginPath();
+      ctx.moveTo(chick.x - 8, chick.y - 14);
+      ctx.lineTo(chick.x - 10, chick.y - 23);
+      ctx.lineTo(chick.x - 3, chick.y - 17);
+      ctx.lineTo(chick.x, chick.y - 25);
+      ctx.lineTo(chick.x + 3, chick.y - 17);
+      ctx.lineTo(chick.x + 10, chick.y - 23);
+      ctx.lineTo(chick.x + 8, chick.y - 14);
+      ctx.fill();
+
+      // Eye & Beak
+      ctx.fillStyle = '#000';
+      ctx.beginPath(); ctx.arc(chick.x + 5, chick.y - 2, 2.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#FF9800';
+      ctx.beginPath(); ctx.arc(chick.x + 10, chick.y + 2, 3.5, 0, Math.PI * 2); ctx.fill();
+
+      activeLoop = requestAnimationFrame(loop);
+    }
+    loop();
+  }
+
+  // ==========================================
+  // STAGE 3: ENHANCED MOANA BOAT GAME
+  // ==========================================
+  function startMoanaGame() {
+    const canvas = document.getElementById('moanaCanvas');
+    const ctx = canvas.getContext('2d');
+    let score = 0;
+    let boat = { x: 135, y: 330, width: 50, height: 45 };
+    let rocks = [];
+    let speed = 2.8;
+
+    function moveBoat(clientX) {
+      let rect = canvas.getBoundingClientRect();
+      boat.x = clientX - rect.left - boat.width / 2;
+      boat.x = Math.max(0, Math.min(320 - boat.width, boat.x));
+    }
+
+    canvas.onpointermove = (e) => moveBoat(e.clientX);
+
+    function loop() {
+      score++;
+      document.getElementById('scoreVal3').innerText = score;
+
+      if (Math.random() < 0.035) {
+        rocks.push({ x: Math.random() * 270, y: -30, size: 26, rot: Math.random() * 3.14 });
+      }
+
+      rocks.forEach(r => r.y += speed);
+
+      // Collision
+      for (let r of rocks) {
+        if (r.y + r.size > boat.y + 10 && r.x + r.size > boat.x && r.x < boat.x + boat.width) {
+          playGameOverSound();
+          setTimeout(() => showLoveMessage('afterMoana', 4), 400);
+          return;
+        }
+      }
+
+      rocks = rocks.filter(r => r.y < 450);
+
+      // Ocean Background
+      ctx.fillStyle = '#64dfdf';
+      ctx.fillRect(0, 0, 320, 420);
+
+      // Waves
+      ctx.fillStyle = 'rgba(255,255,255,0.2)';
+      for (let i = 0; i < 5; i++) {
+        ctx.fillRect(0, ((score * 2 + i * 90) % 420), 320, 6);
+      }
+
+      // Boat
+      ctx.fillStyle = '#8d5524';
+      ctx.beginPath();
+      ctx.roundRect(boat.x + 5, boat.y + 25, 40, 15, 6);
+      ctx.fill();
+
+      // Sail
+      ctx.fillStyle = '#ff70a6';
+      ctx.beginPath();
+      ctx.moveTo(boat.x + 25, boat.y);
+      ctx.lineTo(boat.x + 46, boat.y + 22);
+      ctx.lineTo(boat.x + 25, boat.y + 22);
+      ctx.fill();
+
+      // Rocks
+      ctx.fillStyle = '#52b788';
+      rocks.forEach(r => {
+        ctx.beginPath();
+        ctx.arc(r.x + r.size/2, r.y + r.size/2, r.size/2, 0, Math.PI*2);
+        ctx.fill();
+      });
+
+      activeLoop = requestAnimationFrame(loop);
+    }
+    loop();
+  }
+
+  // ==========================================
+  // STAGE 4: ENHANCED RAPUNZEL HAIR GAME
+  // ==========================================
+  function startRapunzelGame() {
+    const canvas = document.getElementById('rapunzelCanvas');
+    const ctx = canvas.getContext('2d');
+    let score = 0;
+    let hair = { x: 160 };
+    let obstacles = [];
+
+    function moveHair(clientX) {
+      let rect = canvas.getBoundingClientRect();
+      hair.x = clientX - rect.left;
+      hair.x = Math.max(20, Math.min(300, hair.x));
+    }
+
+    canvas.onpointermove = (e) => moveHair(e.clientX);
+
+    function loop() {
+      score++;
+      document.getElementById('scoreVal4').innerText = score;
+
+      if (Math.random() < 0.04) {
+        obstacles.push({ x: Math.random() * 270 + 10, y: 430, size: 22 });
+      }
+
+      obstacles.forEach(o => o.y -= 3.2);
+
+      // Collision
+      for (let o of obstacles) {
+        if (Math.abs(o.x - hair.x) < 22 && Math.abs(o.y - 280) < 20) {
+          playGameOverSound();
+          setTimeout(() => showLoveMessage('afterRapunzel', 5), 400);
+          return;
+        }
+      }
+
+      obstacles = obstacles.filter(o => o.y > -30);
+
+      // Background
+      ctx.fillStyle = '#f8edeb';
+      ctx.fillRect(0, 0, 320, 420);
+
+      // Tower Top
+      ctx.fillStyle = '#e8a598';
+      ctx.fillRect(120, 0, 80, 45);
+
+      // Eugene at Bottom
+      ctx.fillStyle = '#2a9d8f';
+      ctx.fillRect(hair.x - 14, 375, 28, 35);
+      ctx.fillStyle = '#e9c46a';
+      ctx.beginPath(); ctx.arc
